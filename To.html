@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brainware University</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error {
+      color: red;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="container mx-auto p-4">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 rounded-lg mb-6 shadow-lg">
+      <h1 class="text-2xl font-bold">Brainware University</h1>
+      <div class="mt-2 space-x-2" id="nav-buttons">
+        <button onclick="showSection('login')" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">Login</button>
+        <button onclick="showSection('signup')" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">Sign Up</button>
+      </div>
+    </nav>
+
+    <!-- Login Section -->
+    <section id="login-section" class="max-w-md mx-auto">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Login</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="login-email" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="login-password" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Role</label>
+            <select id="login-role" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+              <option value="admin">Admin</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+          <button onclick="login()" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">Login</button>
+          <p class="text-center text-sm text-gray-600">
+            Don't have an account? 
+            <a href="#" onclick="showSection('signup')" class="text-blue-600 hover:underline">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sign Up Section -->
+    <section id="signup-section" class="max-w-md mx-auto hidden">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Sign Up</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="signup-name" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="signup-email" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="signup-password" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Role</label>
+            <select id="signup-role" class="mt-1 p-2 w-full border rounded focus:ring-2 focus:ring-blue-500">
+              <option value="admin">Admin</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+          <button onclick="signup()" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">Sign Up</button>
+          <p class="text-center text-sm text-gray-600">
+            Already have an account? 
+            <a href="#" onclick="showSection('login')" class="text-blue-600 hover:underline">Login</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="admin-section" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">Admin Panel</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Add Student -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-medium mb-4">Add Student</h3>
+          <input type="text" id="studentName" placeholder="Student Name" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <div id="studentNameError" class="error hidden"></div>
+          <input type="text" id="studentCode" placeholder="Student Code" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <div id="studentCodeError" class="error hidden"></div>
+          <select id="studentSection" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+            <option value="">Select Section</option>
+          </select>
+          <div id="studentSectionError" class="error hidden"></div>
+          <button onclick="addStudent()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors" id="add-student-btn">Add Student</button>
+        </div>
+        <!-- Add Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-medium mb-4">Add Section</h3>
+          <input type="text" id="sectionName" placeholder="Section Name (e.g., CS 2023 Batch)" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <div id="sectionNameError" class="error hidden"></div>
+          <button onclick="addSection()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors" id="add-section-btn">Add Section</button>
+        </div>
+        <!-- Add Subject -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-medium mb-4">Add Subject</h3>
+          <input type="text" id="subjectName" placeholder="Subject Name (e.g., Data Structures)" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <div id="subjectNameError" class="error hidden"></div>
+          <select id="subjectSection" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+            <option value="">Select Section</option>
+          </select>
+          <div id="subjectSectionError" class="error hidden"></div>
+          <button onclick="addSubject()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors" id="add-subject-btn">Add Subject</button>
+        </div>
+      </div>
+      <!-- Data Overview -->
+      <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h3 class="text-lg font-medium mb-4">Data Overview</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <h4 class="font-semibold">Students</h4>
+            <ul id="student-list-admin" class="list-disc pl-5 space-y-2"></ul>
+          </div>
+          <div>
+            <h4 class="font-semibold">Sections</h4>
+            <ul id="section-list-admin" class="list-disc pl-5 space-y-2"></ul>
+          </div>
+          <div>
+            <h4 class="font-semibold">Subjects</h4>
+            <ul id="subject-list-admin" class="list-disc pl-5 space-y-2"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Teacher Section -->
+    <section id="teacher-section" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">Teacher Dashboard</h2>
+      <!-- Attendance Form -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-medium mb-4">Mark Attendance</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label for="date" class="block text-sm font-medium text-gray-700">Select Date</label>
+            <input type="date" id="date" class="mt-1 p-2 border rounded w-full focus:ring-2 focus:ring-blue-500" value="">
+          </div>
+          <div>
+            <label for="teacherSection" class="block text-sm font-medium text-gray-700">Select Section</label>
+            <select id="teacherSection" class="p-2 border rounded w-full focus:ring-2 focus:ring-blue-500">
+              <option value="">Select Section</option>
+            </select>
+          </div>
+          <div>
+            <label for="subject" class="block text-sm font-medium text-gray-700">Select Subject</label>
+            <select id="subject" class="p-2 border rounded w-full focus:ring-2 focus:ring-blue-500">
+              <option value="">Select Subject</option>
+            </select>
+          </div>
+        </div>
+        <div id="student-list" class="space-y-4"></div>
+        <div class="mt-4 flex space-x-2">
+          <button onclick="saveAttendance()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors" id="save-btn">Save Attendance</button>
+          <button onclick="exportAttendance()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">Export to CSV</button>
+        </div>
+      </div>
+      <!-- Attendance History -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-medium mb-4">Attendance History</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th class="px-6 py-3">Date</th>
+                <th class="px-6 py-3">Section</th>
+                <th class="px-6 py-3">Subject</th>
+                <th class="px-6 py-3">Present Students</th>
+                <th class="px-6 py-3">Attendance Rate</th>
+              </tr>
+            </thead>
+            <tbody id="history-table"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Analytics Dashboard -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-medium mb-4">Attendance Analytics</h3>
+        <canvas id="attendanceChart" class="w-full h-80"></canvas>
+        <div id="analyticsSummary" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- Student Section -->
+    <section id="student-section" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">Student Portal</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-medium mb-4">Check Attendance</h3>
+        <select id="studentSelect" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Student</option>
+        </select>
+        <select id="studentSubject" class="p-2 border rounded w-full mb-4 focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Subject</option>
+        </select>
+        <div id="studentAttendance" class="mt-4"></div>
+        <button onclick="checkStudentAttendance()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" id="view-btn">View Attendance</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Initialize data
+    const initialData = {
+      students: [],
+      sections: [],
+      subjects: [],
+      attendance: [],
+      users: [] // Add users array for authentication
+    };
+
+    // Load or initialize data
+    let data;
+    const storedData = localStorage.getItem('data');
+    if (!storedData) {
+      data = initialData;
+      localStorage.setItem('data', JSON.stringify(data));
+    } else {
+      data = JSON.parse(storedData);
+      // Ensure users array exists in stored data
+      if (!data.users) {
+        data.users = [];
+        localStorage.setItem('data', JSON.stringify(data));
+      }
+    }
+
+    let attendanceChart;
+    let currentUser = null;
+
+    // Authentication functions
+    function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const role = document.getElementById('login-role').value;
+
+      const user = data.users.find(u => 
+        u.email === email && 
+        u.password === password && 
+        u.role === role
+      );
+
+      if (user) {
+        currentUser = user;
+        updateNavigation();
+        showSection(user.role);
+        alert('Login successful!');
+      } else {
+        alert('Invalid credentials. Please try again.');
+      }
+    }
+
+    function signup() {
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const role = document.getElementById('signup-role').value;
+
+      if (!name || !email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      if (data.users.some(u => u.email === email)) {
+        alert('Email already exists');
+        return;
+      }
+
+      const newUser = {
+        id: data.users.length + 1,
+        name,
+        email,
+        password,
+        role
+      };
+
+      data.users.push(newUser);
+      localStorage.setItem('data', JSON.stringify(data));
+      
+      alert('Sign up successful! Please login.');
+      showSection('login');
+    }
+
+    function logout() {
+      currentUser = null;
+      updateNavigation();
+      showSection('login');
+    }
+
+    function updateNavigation() {
+      const navButtons = document.getElementById('nav-buttons');
+      if (currentUser) {
+        navButtons.innerHTML = `
+          <button onclick="showSection('${currentUser.role}')" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">${currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)} Panel</button>
+          <button onclick="logout()" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">Logout</button>
+        `;
+      } else {
+        navButtons.innerHTML = `
+          <button onclick="showSection('login')" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">Login</button>
+          <button onclick="showSection('signup')" class="px-4 py-2 bg-blue-800 rounded hover:bg-blue-700 transition-colors">Sign Up</button>
+        `;
+      }
+    }
+
+    // Modified showSection function
+    function showSection(section) {
+      // Hide all sections first
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('signup-section').classList.add('hidden');
+      document.getElementById('admin-section').classList.add('hidden');
+      document.getElementById('teacher-section').classList.add('hidden');
+      document.getElementById('student-section').classList.add('hidden');
+
+      // Show requested section
+      if (section === 'login' || section === 'signup') {
+        document.getElementById(`${section}-section`).classList.remove('hidden');
+      } else if (currentUser && currentUser.role === section) {
+        document.getElementById(`${section}-section`).classList.remove('hidden');
+        if (section === 'admin') {
+          loadAdminData();
+        } else if (section === 'teacher') {
+          loadTeacherSection();
+          updateAnalytics();
+          loadAttendanceHistory();
+        } else if (section === 'student') {
+          loadStudentSelect();
+        }
+      } else {
+        showSection('login');
+      }
+    }
+
+    // Admin: Load data overview
+    function loadAdminData() {
+      const studentList = document.getElementById('student-list-admin');
+      const sectionList = document.getElementById('section-list-admin');
+      const subjectList = document.getElementById('subject-list-admin');
+      const studentSectionSelect = document.getElementById('studentSection');
+      const subjectSectionSelect = document.getElementById('subjectSection');
+
+      studentList.innerHTML = '';
+      sectionList.innerHTML = '';
+      subjectList.innerHTML = '';
+      studentSectionSelect.innerHTML = '<option value="">Select Section</option>';
+      subjectSectionSelect.innerHTML = '<option value="">Select Section</option>';
+
+      data.students.forEach(student => {
+        const li = document.createElement('li');
+        const section = data.sections.find(s => s.id === student.sectionId);
+        li.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span>${student.name} (${student.code}) - ${section ? section.name : 'No section'}</span>
+            <button onclick="deleteItem('students', ${student.id})" class="text-red-600 hover:text-red-800">Delete</button>
+          </div>
+        `;
+        studentList.appendChild(li);
+      });
+
+      data.sections.forEach(section => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span>${section.name}</span>
+            <button onclick="deleteItem('sections', ${section.id})" class="text-red-600 hover:text-red-800">Delete</button>
+          </div>
+        `;
+        sectionList.appendChild(li);
+        
+        const option1 = document.createElement('option');
+        const option2 = document.createElement('option');
+        option1.value = section.id;
+        option1.textContent = section.name;
+        option2.value = section.id;
+        option2.textContent = section.name;
+        studentSectionSelect.appendChild(option1);
+        subjectSectionSelect.appendChild(option2);
+      });
+
+      data.subjects.forEach(subject => {
+        const li = document.createElement('li');
+        const section = data.sections.find(s => s.id === subject.sectionId);
+        li.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span>${subject.name} (${section ? section.name : 'No section'})</span>
+            <button onclick="deleteItem('subjects', ${subject.id})" class="text-red-600 hover:text-red-800">Delete</button>
+          </div>
+        `;
+        subjectList.appendChild(li);
+      });
+    }
+
+    // Admin: Delete item
+    function deleteItem(type, id) {
+      if (confirm(`Are you sure you want to delete this ${type.slice(0, -1)}?`)) {
+        if (type === 'students') {
+          // Remove related attendance records
+          data.attendance = data.attendance.map(record => ({
+            ...record,
+            present: record.present.filter(studentId => studentId !== id)
+          }));
+        } else if (type === 'sections') {
+          // Remove related students and subjects
+          data.students = data.students.filter(student => student.sectionId !== id);
+          data.subjects = data.subjects.filter(subject => subject.sectionId !== id);
+          // Remove related attendance records
+          data.attendance = data.attendance.filter(record => record.sectionId !== id);
+        } else if (type === 'subjects') {
+          // Remove related attendance records
+          data.attendance = data.attendance.filter(record => record.subjectId !== id);
+        }
+        
+        // Remove the item itself
+        data[type] = data[type].filter(item => item.id !== id);
+        localStorage.setItem('data', JSON.stringify(data));
+        loadAdminData();
+        alert(`${type.slice(0, -1)} deleted successfully!`);
+      }
+    }
+
+    // Admin: Add student
+    async function addStudent() {
+      const btn = document.getElementById('add-student-btn');
+      const nameInput = document.getElementById('studentName');
+      const codeInput = document.getElementById('studentCode');
+      const sectionSelect = document.getElementById('studentSection');
+      const nameError = document.getElementById('studentNameError');
+      const codeError = document.getElementById('studentCodeError');
+      const sectionError = document.getElementById('studentSectionError');
+
+      nameError.classList.add('hidden');
+      codeError.classList.add('hidden');
+      sectionError.classList.add('hidden');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const name = nameInput.value.trim();
+        const code = codeInput.value.trim();
+        const sectionId = parseInt(sectionSelect.value);
+
+        if (!name) {
+          nameError.textContent = 'Student name is required';
+          nameError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+        if (!code) {
+          codeError.textContent = 'Student code is required';
+          codeError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+        if (!sectionId) {
+          sectionError.textContent = 'Section is required';
+          sectionError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+
+        // Check if student code already exists
+        if (data.students.some(s => s.code === code)) {
+          codeError.textContent = 'Student code already exists';
+          codeError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+
+        const newStudent = {
+          id: data.students.length ? Math.max(...data.students.map(s => s.id)) + 1 : 1,
+          name,
+          code,
+          sectionId
+        };
+        data.students.push(newStudent);
+        localStorage.setItem('data', JSON.stringify(data));
+        nameInput.value = '';
+        codeInput.value = '';
+        sectionSelect.value = '';
+        loadAdminData();
+        alert('Student added successfully!');
+      } catch (error) {
+        if (error.message !== 'Validation failed') {
+          alert(`Error: ${error.message}`);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    // Admin: Add section
+    async function addSection() {
+      const btn = document.getElementById('add-section-btn');
+      const nameInput = document.getElementById('sectionName');
+      const nameError = document.getElementById('sectionNameError');
+
+      nameError.classList.add('hidden');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const name = nameInput.value.trim();
+        if (!name) {
+          nameError.textContent = 'Section name is required';
+          nameError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+        const newSection = {
+          id: data.sections.length ? Math.max(...data.sections.map(s => s.id)) + 1 : 1,
+          name
+        };
+        data.sections.push(newSection);
+        localStorage.setItem('data', JSON.stringify(data));
+        nameInput.value = '';
+        loadAdminData();
+        alert('Section added successfully!');
+      } catch (error) {
+        if (error.message !== 'Validation failed') {
+          alert(`Error: ${error.message}`);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    // Admin: Add subject
+    async function addSubject() {
+      const btn = document.getElementById('add-subject-btn');
+      const nameInput = document.getElementById('subjectName');
+      const sectionSelect = document.getElementById('subjectSection');
+      const nameError = document.getElementById('subjectNameError');
+      const sectionError = document.getElementById('subjectSectionError');
+
+      nameError.classList.add('hidden');
+      sectionError.classList.add('hidden');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const name = nameInput.value.trim();
+        const sectionId = parseInt(sectionSelect.value);
+
+        if (!name) {
+          nameError.textContent = 'Subject name is required';
+          nameError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+        if (!sectionId) {
+          sectionError.textContent = 'Section is required';
+          sectionError.classList.remove('hidden');
+          throw new Error('Validation failed');
+        }
+
+        const newSubject = {
+          id: data.subjects.length ? Math.max(...data.subjects.map(s => s.id)) + 1 : 1,
+          name,
+          sectionId
+        };
+        data.subjects.push(newSubject);
+        localStorage.setItem('data', JSON.stringify(data));
+        nameInput.value = '';
+        sectionSelect.value = '';
+        loadAdminData();
+        alert('Subject added successfully!');
+      } catch (error) {
+        if (error.message !== 'Validation failed') {
+          alert(`Error: ${error.message}`);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    // Teacher: Load section, subject, and student list
+    function loadTeacherSection() {
+      const sectionSelect = document.getElementById('teacherSection');
+      const subjectSelect = document.getElementById('subject');
+      const studentList = document.getElementById('student-list');
+
+      sectionSelect.innerHTML = '<option value="">Select Section</option>';
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+      studentList.innerHTML = '';
+
+      data.sections.forEach(section => {
+        const option = document.createElement('option');
+        option.value = section.id;
+        option.textContent = section.name;
+        sectionSelect.appendChild(option);
+      });
+
+      sectionSelect.onchange = () => {
+        const sectionId = parseInt(sectionSelect.value);
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        studentList.innerHTML = '';
+
+        if (sectionId) {
+          const sectionSubjects = data.subjects.filter(s => s.sectionId === sectionId);
+          sectionSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.id;
+            option.textContent = subject.name;
+            subjectSelect.appendChild(option);
+          });
+
+          const sectionStudents = data.students.filter(s => s.sectionId === sectionId);
+          sectionStudents.forEach(student => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" value="${student.id}" class="student-checkbox h-5 w-5 text-blue-600">
+                <span class="text-gray-700">${student.name}</span>
+              </label>
+            `;
+            studentList.appendChild(div);
+          });
+        }
+      };
+
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+    }
+
+    // Teacher: Save attendance
+    async function saveAttendance() {
+      const saveBtn = document.getElementById('save-btn');
+      saveBtn.disabled = true;
+      saveBtn.classList.add('loading');
+      try {
+        const date = document.getElementById('date').value;
+        const sectionId = parseInt(document.getElementById('teacherSection').value);
+        const subjectId = parseInt(document.getElementById('subject').value);
+        if (!date || !sectionId || !subjectId) {
+          throw new Error('Please select date, section, and subject');
+        }
+        const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+        const presentStudents = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        const attendanceRecord = { date, sectionId, subjectId, present: presentStudents };
+        data.attendance = data.attendance.filter(record => 
+          record.date !== date || record.sectionId !== sectionId || record.subjectId !== subjectId
+        );
+        data.attendance.push(attendanceRecord);
+        localStorage.setItem('data', JSON.stringify(data));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        alert('Attendance saved successfully!');
+        updateAnalytics();
+        loadAttendanceHistory();
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('loading');
+      }
+    }
+
+    // Student: Load student and subject select
+    function loadStudentSelect() {
+      const studentSelect = document.getElementById('studentSelect');
+      const subjectSelect = document.getElementById('studentSubject');
+      studentSelect.innerHTML = '<option value="">Select Student</option>';
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+
+      data.students.forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.id;
+        option.textContent = student.name;
+        studentSelect.appendChild(option);
+      });
+
+      studentSelect.onchange = () => {
+        const studentId = parseInt(studentSelect.value);
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        if (studentId) {
+          const student = data.students.find(s => s.id === studentId);
+          const sectionSubjects = data.subjects.filter(s => s.sectionId === student.sectionId);
+          sectionSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.id;
+            option.textContent = subject.name;
+            subjectSelect.appendChild(option);
+          });
+        }
+      };
+    }
+
+    // Student: Check attendance
+    async function checkStudentAttendance() {
+      const viewBtn = document.getElementById('view-btn');
+      viewBtn.disabled = true;
+      viewBtn.classList.add('loading');
+      try {
+        const studentId = parseInt(document.getElementById('studentSelect').value);
+        const subjectId = parseInt(document.getElementById('studentSubject').value);
+        if (!studentId || !subjectId) {
+          throw new Error('Please select a student and subject');
+        }
+        const student = data.students.find(s => s.id === studentId);
+        const sectionId = student.sectionId;
+        const records = data.attendance.filter(record => 
+          record.sectionId === sectionId && 
+          record.subjectId === subjectId && 
+          record.present.includes(studentId)
+        );
+        const totalDays = data.attendance.filter(record => 
+          record.sectionId === sectionId && 
+          record.subjectId === subjectId
+        ).length;
+        const presentDays = records.length;
+        const attendanceRate = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : 0;
+
+        document.getElementById('studentAttendance').innerHTML = `
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="font-semibold text-blue-800">${student.name} - ${data.subjects.find(s => s.id === subjectId).name}</p>
+            <p class="text-gray-600">Present: ${presentDays} out of ${totalDays} days</p>
+            <p class="text-gray-600">Attendance Rate: ${attendanceRate}%</p>
+            <div class="mt-2 h-2 bg-gray-200 rounded-full">
+              <div class="h-2 bg-blue-600 rounded-full" style="width: ${attendanceRate}%"></div>
+            </div>
+          </div>
+        `;
+        await new Promise(resolve => setTimeout(resolve, 500));
+        alert(`${student.name}, your attendance rate for ${data.subjects.find(s => s.id === subjectId).name} is ${attendanceRate}%. Keep attending classes!`);
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      } finally {
+        viewBtn.disabled = false;
+        viewBtn.classList.remove('loading');
+      }
+    }
+
+    // Teacher: Load attendance history
+    function loadAttendanceHistory() {
+      const historyTable = document.getElementById('history-table');
+      historyTable.innerHTML = '';
+      data.attendance.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(record => {
+        const section = data.sections.find(s => s.id === record.sectionId);
+        const subject = data.subjects.find(s => s.id === record.subjectId);
+        const sectionStudents = data.students.filter(s => s.sectionId === record.sectionId);
+        const presentCount = record.present.length;
+        const rate = ((presentCount / sectionStudents.length) * 100).toFixed(2);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-6 py-4">${record.date}</td>
+          <td class="px-6 py-4">${section ? section.name : 'Unknown'}</td>
+          <td class="px-6 py-4">${subject ? subject.name : 'Unknown'}</td>
+          <td class="px-6 py-4">${presentCount} (${record.present.map(id => data.students.find(s => s.id === id).name).join(', ')})</td>
+          <td class="px-6 py-4">${rate}%</td>
+        `;
+        historyTable.appendChild(row);
+      });
+    }
+
+    // Teacher: Export attendance
+    function exportAttendance() {
+      let csvContent = 'Date,Section,Subject,Student,Status\n';
+      data.attendance.forEach(record => {
+        const section = data.sections.find(s => s.id === record.sectionId);
+        const subject = data.subjects.find(s => s.id === record.subjectId);
+        const sectionStudents = data.students.filter(s => s.sectionId === record.sectionId);
+        sectionStudents.forEach(student => {
+          const status = record.present.includes(student.id) ? 'Present' : 'Absent';
+          csvContent += `${record.date},${section ? section.name : 'Unknown'},${subject ? subject.name : 'Unknown'},${student.name},${status}\n`;
+        });
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `attendance_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Teacher: Update analytics
+    function updateAnalytics() {
+      const totalDays = data.attendance.length;
+      const studentAttendance = data.students.map(student => {
+        const presentDays = data.attendance.filter(record => 
+          record.sectionId === student.sectionId && 
+          record.present.includes(student.id)
+        ).length;
+        const absentDays = data.attendance.filter(record => 
+          record.sectionId === student.sectionId
+        ).length - presentDays;
+        return {
+          name: student.name,
+          presentDays,
+          absentDays,
+          rate: totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : 0
+        };
+      });
+
+      const summary = document.getElementById('analyticsSummary');
+      summary.innerHTML = `
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <p class="font-semibold">Total Recorded Days</p>
+          <p class="text-2xl">${totalDays}</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+          <p class="font-semibold">Average Attendance</p>
+          <p class="text-2xl">${(studentAttendance.reduce((sum, s) => sum + parseFloat(s.rate), 0) / data.students.length).toFixed(2)}%</p>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+          <p class="font-semibold">Total Students</p>
+          <p class="text-2xl">${data.students.length}</p>
+        </div>
+      `;
+
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      if (attendanceChart) {
+        attendanceChart.destroy();
+      }
+      attendanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: studentAttendance.map(s => s.name),
+          datasets: [
+            {
+              label: 'Present Days',
+              data: studentAttendance.map(s => s.presentDays),
+              backgroundColor: 'rgba(54, 162, 235, 0.6)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Absent Days',
+              data: studentAttendance.map(s => s.absentDays),
+              backgroundColor: 'rgba(255, 99, 132, 0.6)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.raw} days`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              title: { display: true, text: 'Days' }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize with login section
+    showSection('login');
+  </script>
+</body>
+</html>
